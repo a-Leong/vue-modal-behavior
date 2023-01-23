@@ -1,5 +1,5 @@
 <template>
-  <ion-item v-if="message" :routerLink="'/message/' + message.id" :detail="false" class="list-item">
+  <ion-item v-if="message" @click="openMessageModal" :detail="false" class="list-item" button>
     <div slot="start" :class="!message.read ? 'dot dot-unread' : 'dot'"></div>
     <ion-label class="ion-text-wrap">
       <h2>
@@ -18,17 +18,27 @@
 </template>
 
 <script setup lang="ts">
-import { IonIcon, IonItem, IonLabel, IonNote } from '@ionic/vue';
-import { chevronForward } from 'ionicons/icons';
+import ViewMessagePage from "@/views/ViewMessagePage.vue";
+import { IonIcon, IonItem, IonLabel, IonNote, modalController } from '@ionic/vue';
+import { chevronForward } from "ionicons/icons";
 
-defineProps({
+const props = defineProps({
   message: Object,
 });
 
 const isIos = () => {
   const win = window as any;
-  return win && win.Ionic && win.Ionic.mode === 'ios';
+  return win && win.Ionic && win.Ionic.mode === "ios";
 };
+
+async function openMessageModal() {
+  const messageModal = await modalController.create({
+    component: ViewMessagePage,
+    componentProps: { message: props.message },
+  });
+
+  return messageModal.present();
+}
 </script>
 
 <style scoped>

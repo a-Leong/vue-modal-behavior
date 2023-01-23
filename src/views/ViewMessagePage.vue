@@ -3,19 +3,21 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button :text="getBackButtonText()" default-href="/"></ion-back-button>
+          <ion-button :text="getBackButtonText()" @click="dismissModal">
+            <ion-icon :icon="close" slot="icon-only"></ion-icon>
+          </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true" v-if="message">
+    <ion-content :fullscreen="true" v-if="initialMessageValue">
       <ion-item>
         <ion-icon :icon="personCircle" color="primary"></ion-icon>
         <ion-label class="ion-text-wrap">
           <h2>
-            {{ message.fromName }}
+            {{ initialMessageValue.fromName }}
             <span class="date">
-              <ion-note>{{ message.date }}</ion-note>
+              <ion-note>{{ initialMessageValue.date }}</ion-note>
             </span>
           </h2>
           <h3>To: <ion-note>Me</ion-note></h3>
@@ -23,7 +25,7 @@
       </ion-item>
 
       <div class="ion-padding">
-        <h1>{{ message.subject }}</h1>
+        <h1>{{ initialMessageValue.subject }}</h1>
         <p>
           Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         </p>
@@ -33,9 +35,8 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
 import {
-  IonBackButton,
+  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
@@ -45,9 +46,27 @@ import {
   IonNote,
   IonPage,
   IonToolbar,
-} from '@ionic/vue';
-import { personCircle } from 'ionicons/icons';
-import { getMessage } from '../data/messages';
+modalController,
+} from "@ionic/vue";
+import { close, personCircle } from "ionicons/icons";
+import { onMounted, onUnmounted, ref } from "vue";
+import { Message } from "../data/messages";
+
+const props = defineProps<{ message: Message }>();
+
+const initialMessageValue = ref();
+
+onMounted(() => {
+  console.log("mounted ViewMessagePage");
+  
+  // Some initializing logic
+  initialMessageValue.value = props.message;
+  
+});
+
+onUnmounted(() => {
+  console.log("unmounted ViewMessagePage");
+});
 
 const getBackButtonText = () => {
   const win = window as any;
@@ -55,8 +74,9 @@ const getBackButtonText = () => {
   return mode === 'ios' ? 'Inbox' : '';
 };
 
-const route = useRoute();
-const message = getMessage(parseInt(route.params.id as string, 10));
+async function dismissModal() {
+  return modalController.dismiss()
+}
 </script>
 
 <style scoped>
