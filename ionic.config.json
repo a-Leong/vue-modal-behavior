@@ -1,0 +1,7 @@
+{
+  "name": "vue-modal-behavior",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
